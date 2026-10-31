@@ -2,42 +2,203 @@
 <html lang="zh-Hant">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>生字卡 · Luo Shi Cheng</title>
+<meta name="theme-color" content="#0f2a3a">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;800&family=Noto+Serif+TC:wght@700;900&family=Nunito:wght@700;800&display=swap" rel="stylesheet">
 <style>
-  :root{--bg:#1c1511;--card:#2a201a;--ink:#f1e7db;--soft:#b9a999;--gold:#ffc857;--blue:#5aa9e6;--pink:#e86f9a;}
-  *{box-sizing:border-box}
-  body{margin:0;min-height:100vh;background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,"Noto Sans TC",sans-serif;display:flex;justify-content:center;padding:32px 16px;}
-  main{width:100%;max-width:460px;}
-  h1{font-size:28px;margin:0 0 4px;text-align:center}
-  .sub{text-align:center;color:var(--soft);font-size:14px;margin-bottom:28px}
-  a.deck{display:block;text-decoration:none;color:inherit;background:var(--card);border:2px solid rgba(255,255,255,.1);border-left-width:8px;border-radius:16px;padding:18px 20px;margin-bottom:16px;}
-  a.deck:active,a.deck:hover{border-color:var(--gold)}
-  a.novice{border-left-color:var(--blue)} a.a1{border-left-color:var(--pink)}
-  .name{font-size:20px;font-weight:800}
-  .meta{color:var(--soft);font-size:13px;margin-top:4px}
-  .tags{margin-top:10px;font-size:12px;color:var(--gold)}
-  footer{text-align:center;color:var(--soft);font-size:12px;margin-top:24px}
+  :root{
+    --sea1:#0b2233; --sea2:#14506b; --sea3:#1d7a8c;
+    --land:#3fae7a; --land2:#2c8a63; --ink:#fff7e8; --gold:#ffc857;
+    --blue:#4a9be8; --blue-d:#2a69ad; --pink:#ee6c9b; --pink-d:#b13f6c; --green:#34b47a; --green-d:#1f7f55;
+  }
+  *{box-sizing:border-box;margin:0}
+  html{background:#0b2233}
+  html,body{min-height:100%}
+  body{
+    font-family:'Nunito',system-ui,sans-serif;color:var(--ink);
+    background:radial-gradient(120% 80% at 50% 0%,var(--sea3) 0%,var(--sea2) 38%,var(--sea1) 100%);
+    background-attachment:fixed; overflow-x:hidden;
+  }
+  /* sea waves */
+  .waves{position:fixed;inset:0;pointer-events:none;opacity:.18;
+    background:
+      repeating-radial-gradient(circle at 50% 55%,transparent 0 46px,rgba(255,255,255,.55) 47px 48px);
+  }
+  .floaters{position:fixed;inset:0;pointer-events:none;overflow:hidden}
+  .floaters span{position:absolute;font-family:'Noto Serif TC',serif;font-weight:900;color:rgba(255,247,232,.12);
+    animation:drift linear infinite;user-select:none}
+  @keyframes drift{0%{transform:translateY(105vh) rotate(-8deg)}100%{transform:translateY(-20vh) rotate(10deg)}}
+
+  .wrap{position:relative;max-width:1000px;margin:0 auto;padding:22px 16px 28px;display:grid;gap:8px;
+    grid-template-areas:"title" "stage" "menu" "foot"}
+  header{grid-area:title;text-align:center}
+  .badge{display:inline-block;background:rgba(0,0,0,.28);border:1px solid rgba(255,255,255,.2);border-radius:999px;
+    padding:5px 14px;font-size:12px;letter-spacing:.18em;color:var(--gold);font-weight:800}
+  h1{font-family:'Noto Serif TC',serif;font-weight:900;font-size:clamp(54px,15vw,92px);line-height:1.05;margin-top:8px;
+    color:var(--gold);text-shadow:0 4px 0 #b9811b,0 8px 0 rgba(0,0,0,.35),0 0 30px rgba(255,200,87,.35)}
+  .sub{font-family:'Baloo 2',sans-serif;font-weight:800;font-size:clamp(15px,3.8vw,20px);letter-spacing:.04em;margin-top:2px}
+
+  /* stage */
+  .stage{grid-area:stage;position:relative;height:clamp(330px,92vw,430px)}
+  .map{position:absolute;right:4%;top:0;height:100%;filter:drop-shadow(0 12px 22px rgba(0,0,0,.45))}
+  .hero{position:absolute;left:2%;bottom:0;height:70%;animation:bob 3.2s ease-in-out infinite;transform-origin:50% 100%;filter:drop-shadow(0 6px 10px rgba(0,0,0,.35))}
+  @keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}
+  .bubble{position:absolute;left:4%;top:16%;background:#fff;color:#2b2118;border-radius:16px;padding:7px 12px;
+    font-family:'Noto Serif TC',serif;font-weight:900;font-size:17px;box-shadow:0 4px 0 rgba(0,0,0,.2);animation:pop 3.2s ease-in-out infinite}
+  .bubble:after{content:"";position:absolute;left:14px;bottom:-9px;border:9px solid transparent;border-top-color:#fff;border-bottom:0}
+  @keyframes pop{0%,100%{transform:scale(1)}50%{transform:scale(1.06)}}
+  .pin circle.pulse{animation:pulse 2.2s ease-out infinite;transform-box:fill-box;transform-origin:center}
+  @keyframes pulse{0%{transform:scale(1);opacity:.7}100%{transform:scale(3.2);opacity:0}}
+
+  /* menu */
+  .menu{grid-area:menu;display:grid;gap:14px;margin-top:10px}
+  .pick{text-align:center;font-family:'Baloo 2',sans-serif;font-weight:800;font-size:15px;letter-spacing:.06em;color:#cfe9ee}
+  .lvl{display:flex;align-items:center;gap:14px;text-decoration:none;color:#fff;background:var(--c);border-radius:20px;
+    padding:14px 18px;box-shadow:0 7px 0 var(--d),0 14px 24px rgba(0,0,0,.35);border:2px solid rgba(255,255,255,.35);
+    transition:transform .08s,box-shadow .08s;-webkit-tap-highlight-color:transparent}
+  .lvl:hover{transform:translateY(-2px);box-shadow:0 9px 0 var(--d),0 18px 28px rgba(0,0,0,.35)}
+  .lvl:active{transform:translateY(6px);box-shadow:0 1px 0 var(--d),0 4px 8px rgba(0,0,0,.35)}
+  .ico{flex:none;width:56px;height:56px;border-radius:16px;background:rgba(255,255,255,.22);display:grid;place-items:center;
+    font-family:'Noto Serif TC',serif;font-weight:900;font-size:30px;text-shadow:0 2px 0 rgba(0,0,0,.25)}
+  .txt{flex:1;min-width:0}
+  .name{font-family:'Baloo 2',sans-serif;font-weight:800;font-size:clamp(18px,4.6vw,22px);line-height:1.15}
+  .meta{font-size:13px;font-weight:800;opacity:.92;margin-top:2px}
+  .mini{display:flex;gap:6px;margin-top:6px;flex-wrap:wrap}
+  .mini i{font-style:normal;font-size:11px;font-weight:800;background:rgba(0,0,0,.22);border-radius:999px;padding:2px 8px}
+  .go{flex:none;width:38px;height:38px;border-radius:50%;background:#fff;color:var(--d);display:grid;place-items:center;font-size:18px;font-weight:900}
+  .l1{--c:var(--blue);--d:var(--blue-d)} .l2{--c:var(--pink);--d:var(--pink-d)} .l3{--c:var(--green);--d:var(--green-d)}
+  footer{grid-area:foot;text-align:center;font-size:12px;color:#a9cdd6;margin-top:8px}
+  footer b{color:var(--gold);font-family:'Noto Serif TC',serif}
+
+  @media (min-width:860px){
+    .wrap{grid-template-columns:1.3fr 1fr;grid-template-areas:"title title" "stage menu" "foot foot";align-items:center;column-gap:34px;padding-top:34px}
+    .stage{height:540px}
+    .map{right:2%}
+    .hero{height:64%;left:0}
+    .bubble{left:2%;top:20%}
+    .menu{margin-top:0}
+  }
+  @media (prefers-reduced-motion:reduce){*{animation:none!important}}
 </style>
 </head>
 <body>
-<main>
-  <h1>生字卡</h1>
-  <div class="sub">Made by 羅世成 · Russel Acosta</div>
+<div class="waves"></div>
+<div class="floaters" id="fl"></div>
 
-  <a class="deck novice" href="novice2.html">
-    <div class="name">📘 Novice2</div>
-    <div class="meta">Blue paper · Day 1–24 · 260 words</div>
-    <div class="tags">🎯 Quiz · 📖 Vocabulary · 🎮 Game + ✍️ Tones</div>
-  </a>
+<div class="wrap">
+  <header>
+    <span class="badge">MANDARIN · 台灣華語</span>
+    <h1>生字卡</h1>
+    <div class="sub">Flashcard Quest · Quiz · Vocabulary · Game</div>
+  </header>
 
-  <a class="deck a1" href="a1.html">
-    <div class="name">📕 A1</div>
-    <div class="meta">Pink paper · Day 25–43 · 180 words</div>
-    <div class="tags">🎯 Quiz · 📖 Vocabulary · 🎮 Game + ✍️ Tones</div>
-  </a>
+  <section class="stage" aria-hidden="true">
+    <!-- Taiwan -->
+    <svg class="map" viewBox="-30 -10 280 380" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <radialGradient id="glow" cx="50%" cy="45%" r="60%"><stop offset="0" stop-color="#7be3b0" stop-opacity=".55"/><stop offset="1" stop-color="#7be3b0" stop-opacity="0"/></radialGradient>
+        <linearGradient id="land" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#58c98f"/><stop offset="1" stop-color="#2c8a63"/></linearGradient>
+      </defs>
+      <ellipse cx="108" cy="185" rx="130" ry="180" fill="url(#glow)"/>
+      <g id="tw">
+        <path d="M138 8 C150 6 165 20 172 38 C182 60 190 80 188 104 C186 130 176 150 168 176 C160 206 152 236 138 268 C126 296 112 322 98 346 C90 352 82 340 76 322 C66 292 56 268 50 236 C44 204 40 176 44 148 C48 120 60 100 76 78 C92 56 108 30 120 16 C126 10 132 8 138 8 Z"
+              fill="url(#land)" stroke="#d9fff0" stroke-width="3" stroke-linejoin="round"/>
+        <g fill="none" stroke="rgba(255,255,255,.28)" stroke-width="1.6" transform="translate(108 180)">
+          <path transform="scale(.8)" d="M30 -172 C42 -174 57 -160 64 -142 C74 -120 82 -100 80 -76 C78 -50 68 -30 60 -4 C52 26 44 56 30 88 C18 116 4 142 -10 166 C-18 172 -26 160 -32 142 C-42 112 -52 88 -58 56 C-64 24 -68 -4 -64 -32 C-60 -60 -48 -80 -32 -102 C-16 -124 0 -150 12 -164 C18 -170 24 -172 30 -172 Z"/>
+          <path transform="scale(.55)" d="M30 -172 C42 -174 57 -160 64 -142 C74 -120 82 -100 80 -76 C78 -50 68 -30 60 -4 C52 26 44 56 30 88 C18 116 4 142 -10 166 C-18 172 -26 160 -32 142 C-42 112 -52 88 -58 56 C-64 24 -68 -4 -64 -32 C-60 -60 -48 -80 -32 -102 C-16 -124 0 -150 12 -164 C18 -170 24 -172 30 -172 Z"/>
+        </g>
+      </g>
+      <g font-family="Noto Serif TC,serif" font-weight="900" font-size="13" fill="#fff" stroke="#0b2233" stroke-width="3" paint-order="stroke">
+        <g class="pin"><circle class="pulse" cx="148" cy="40" r="4" fill="#ffc857"/><circle cx="148" cy="40" r="4.5" fill="#ffc857" stroke="#fff" stroke-width="1.5"/><text x="156" y="44">台北</text></g>
+        <g class="pin"><circle class="pulse" cx="78" cy="146" r="4" fill="#ffc857"/><circle cx="78" cy="146" r="4.5" fill="#ffc857" stroke="#fff" stroke-width="1.5"/><text x="86" y="150">台中</text></g>
+        <g class="pin"><circle class="pulse" cx="146" cy="170" r="4" fill="#ffc857"/><circle cx="146" cy="170" r="4.5" fill="#ffc857" stroke="#fff" stroke-width="1.5"/><text x="116" y="190">花蓮</text></g>
+        <g class="pin"><circle class="pulse" cx="86" cy="300" r="4" fill="#ffc857"/><circle cx="86" cy="300" r="4.5" fill="#ffc857" stroke="#fff" stroke-width="1.5"/><text x="96" y="304">高雄</text></g>
+      </g>
+    </svg>
 
-  <footer>Tip: add this page to your phone's home screen.</footer>
-</main>
+    <!-- Hero holding a book -->
+    <svg class="hero" viewBox="0 0 220 300" xmlns="http://www.w3.org/2000/svg">
+      <ellipse cx="110" cy="290" rx="62" ry="8" fill="rgba(0,0,0,.3)"/>
+      <!-- legs -->
+      <rect x="78" y="204" width="29" height="76" rx="10" fill="#243a5e"/>
+      <rect x="113" y="204" width="29" height="76" rx="10" fill="#243a5e"/>
+      <ellipse cx="90" cy="282" rx="21" ry="9" fill="#1b2230"/><ellipse cx="130" cy="282" rx="21" ry="9" fill="#1b2230"/>
+      <!-- torso -->
+      <path d="M66 140 Q66 116 90 112 L130 112 Q154 116 154 140 L152 214 Q110 226 68 214 Z" fill="#2aa6a0"/>
+      <path d="M96 112 L110 132 L124 112 Z" fill="#fff7e8"/>
+      <rect x="104" y="130" width="12" height="46" rx="5" fill="#e2493f"/>
+      <!-- neck + head -->
+      <rect x="99" y="94" width="22" height="22" rx="8" fill="#e8b98c"/>
+      <circle cx="110" cy="70" r="38" fill="#f4cfa6"/>
+      <circle cx="73" cy="74" r="8" fill="#f4cfa6"/><circle cx="147" cy="74" r="8" fill="#f4cfa6"/>
+      <path d="M72 66 C70 36 92 26 112 28 C134 28 152 40 148 66 C140 52 128 46 110 48 C92 46 80 54 72 66 Z" fill="#1d1a1a"/>
+      <circle cx="94" cy="74" r="4.2" fill="#2b2118"/><circle cx="126" cy="74" r="4.2" fill="#2b2118"/>
+      <circle cx="95.5" cy="72.5" r="1.4" fill="#fff"/><circle cx="127.5" cy="72.5" r="1.4" fill="#fff"/>
+      <g fill="none" stroke="#2b2118" stroke-width="2.4"><circle cx="94" cy="74" r="12"/><circle cx="126" cy="74" r="12"/><path d="M106 74 H114"/></g>
+      <path d="M96 94 Q110 106 124 94" fill="none" stroke="#9c4a35" stroke-width="3.2" stroke-linecap="round"/>
+      <circle cx="82" cy="90" r="6" fill="#f08a7b" opacity=".45"/><circle cx="138" cy="90" r="6" fill="#f08a7b" opacity=".45"/>
+      <!-- open book -->
+      <path d="M52 152 L110 140 L168 152 L168 214 L110 204 L52 214 Z" fill="#8c2f39"/>
+      <path d="M58 150 L108 140 L108 202 L58 211 Z" fill="#fffaf0"/>
+      <path d="M112 140 L162 150 L162 211 L112 202 Z" fill="#fff3da"/>
+      <path d="M110 140 V203" stroke="#d8c6a3" stroke-width="3"/>
+      <g font-family="Noto Serif TC,serif" font-weight="900" font-size="30" fill="#b9362f" text-anchor="middle">
+        <text x="84" y="190" transform="rotate(-6 84 190)">字</text>
+        <text x="138" y="190" transform="rotate(6 138 190)" fill="#1d6f8a">學</text>
+      </g>
+      <g stroke="#e0d2b4" stroke-width="2"><path d="M64 160 H100"/><path d="M120 160 H154"/></g>
+      <!-- arms + hands -->
+      <path d="M72 128 Q38 156 56 196" fill="none" stroke="#2aa6a0" stroke-width="19" stroke-linecap="round"/>
+      <path d="M148 128 Q182 156 164 196" fill="none" stroke="#2aa6a0" stroke-width="19" stroke-linecap="round"/>
+      <circle cx="58" cy="198" r="10" fill="#f4cfa6"/><circle cx="162" cy="198" r="10" fill="#f4cfa6"/>
+    </svg>
+    <div class="bubble">你好！</div>
+  </section>
+
+  <nav class="menu">
+    <div class="pick">▼ 選擇課程 · CHOOSE YOUR COURSE ▼</div>
+
+    <a class="lvl l1" href="novice2.html">
+      <div class="ico">新</div>
+      <div class="txt"><div class="name">Novice 2</div><div class="meta">Blue paper · Day 1–24 · 260 words</div>
+        <div class="mini"><i>🎯 Quiz</i><i>📖 Vocab</i><i>🎮 Game</i><i>✍️ Tones</i></div></div>
+      <div class="go">▶</div>
+    </a>
+
+    <a class="lvl l2" href="a1.html">
+      <div class="ico">愛</div>
+      <div class="txt"><div class="name">A1</div><div class="meta">Pink paper · Day 25–43 · 180 words</div>
+        <div class="mini"><i>🎯 Quiz</i><i>📖 Vocab</i><i>🎮 Game</i><i>✍️ Tones</i></div></div>
+      <div class="go">▶</div>
+    </a>
+
+    <a class="lvl l3" href="mcv1.html">
+      <div class="ico">書</div>
+      <div class="txt"><div class="name">Modern Chinese Vocabulary Book 1</div><div class="meta">Lessons 1–11 · 543 words</div>
+        <div class="mini"><i>🎯 Quiz</i><i>📖 Vocab</i><i>🎮 Game</i><i>✍️ Tones</i></div></div>
+      <div class="go">▶</div>
+    </a>
+  </nav>
+
+  <footer>Made by <b>羅世成</b> · Russel Acosta &nbsp;·&nbsp; Add to your home screen to play like an app</footer>
+</div>
+
+<script>
+  // floating hanzi in the background
+  (function(){
+    var chars="學字聲調愛茶水山書好朋友台灣海天月日".split(""), fl=document.getElementById('fl');
+    for(var i=0;i<16;i++){
+      var s=document.createElement('span');
+      s.textContent=chars[i%chars.length];
+      s.style.left=(Math.random()*94)+'%';
+      s.style.fontSize=(28+Math.random()*52)+'px';
+      s.style.animationDuration=(22+Math.random()*26)+'s';
+      s.style.animationDelay=(-Math.random()*40)+'s';
+      fl.appendChild(s);
+    }
+  })();
+</script>
 </body>
 </html>
