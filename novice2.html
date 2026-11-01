@@ -934,6 +934,12 @@
     border:1px solid rgba(255,255,255,.14);
   }
 </style>
+<link rel="icon" href="favicon.ico" sizes="any">
+<link rel="icon" type="image/svg+xml" href="icon.svg">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="生字卡">
 </head>
 <body>
 <div class="wrap">
@@ -1759,6 +1765,7 @@ function handleGameAnswer(btn, choice, correctItem){
   if(gState.locked) return;
   gState.locked = true;
   const isCorrect = choice === correctItem;
+  const hideTone = (gameMode === 'both' && !!correctItem.tones);   // don't reveal pinyin/audio before the tone question
 
   [...gameChoices.children].forEach(c => c.classList.add('disabled'));
   if(isCorrect){
@@ -1766,15 +1773,15 @@ function handleGameAnswer(btn, choice, correctItem){
     gState.score += 1;
     gState.streak += 1;
     gState.bestStreak = Math.max(gState.bestStreak, gState.streak);
-    gameFeedback.textContent = '✅ Correct! ' + correctItem.zh + ' (' + correctItem.py + ')';
-    speak(correctItem.zh);
+    gameFeedback.textContent = hideTone ? '✅ Correct! ' + correctItem.zh : '✅ Correct! ' + correctItem.zh + ' (' + correctItem.py + ')';
+    if(!hideTone) speak(correctItem.zh);
   } else {
     btn.classList.add('wrong');
     [...gameChoices.children].forEach(c => {
       if(c.textContent === correctItem.en) c.classList.add('correct');
     });
     gState.streak = 0;
-    gameFeedback.textContent = '❌ It was ' + correctItem.zh + ' (' + correctItem.py + ')';
+    gameFeedback.textContent = hideTone ? '❌ It was ' + correctItem.zh : '❌ It was ' + correctItem.zh + ' (' + correctItem.py + ')';
   }
   updateGameScorePill();
 
