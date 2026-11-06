@@ -933,6 +933,54 @@
     background:rgba(255,255,255,.08);
     border:1px solid rgba(255,255,255,.14);
   }
+
+/* ===== unified theme (v2) ===== */
+:root{--accent:#3b82c4;--accent2:#9cc9f2;--gold:#9cc9f2;--card-margin:#3b82c4;--tag-pink:#3b82c4;--tag-compiled:#3b82c4;--ink-soft:#6b6b6b;}
+body{background:radial-gradient(120% 55% at 50% 0,#14505a 0,#0b2a2f 62%) fixed,#0b2a2f !important;color:#eafaf6;font-family:'Nunito',system-ui,sans-serif;}
+.wrap{max-width:560px;}
+.topbar{display:flex;align-items:center;gap:12px;margin:2px 0 14px;}
+.topbar .back{flex:none;width:40px;height:40px;border-radius:13px;background:rgba(255,255,255,.12);color:#fff;text-decoration:none;display:grid;place-items:center;font-size:19px;font-weight:800;}
+.topbar .ttl{flex:1;min-width:0;}
+.topbar .ttl b{display:block;font-family:'Baloo 2',sans-serif;font-size:19px;line-height:1.15;color:#fff;}
+.topbar .ttl small{display:block;font-size:12px;color:#b9d8d3;margin-top:2px;}
+.topbar .pill{flex:none;background:var(--accent);color:#fff;font-weight:800;font-size:12.5px;padding:6px 12px;border-radius:99px;}
+.sel-row{display:flex;gap:10px;margin-bottom:12px;}
+.sel-row .dd{flex:1;min-width:0;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.18);border-radius:14px;padding:7px 12px 6px;}
+.sel-row .dd small{display:block;font-size:10px;letter-spacing:.1em;color:#9fc7c1;font-weight:800;}
+.sel-row .dd select{width:100%;background:transparent;border:0;outline:0;color:#fff;font-family:'Nunito',sans-serif;font-weight:800;font-size:14.5px;padding:2px 0;appearance:auto;}
+.sel-row .dd select option{color:#111;}
+#lessonFilterRow,#sectionFilterRow{display:none !important;}
+.tab-nav{background:rgba(0,0,0,.28);border-radius:16px;padding:4px;gap:4px;margin-bottom:14px;}
+.tab-btn{border:0;background:transparent;color:#b9d8d3;border-radius:12px;padding:10px 6px;font-size:14px;}
+.tab-btn.active{background:rgba(255,255,255,.17);color:#fff;border:0;}
+.tab-count{background:var(--accent);color:#fff;}
+.stats-row{background:transparent;border:0;padding:0 2px;margin-bottom:6px;gap:8px;}
+.stat{display:flex;align-items:baseline;justify-content:center;gap:6px;background:rgba(255,255,255,.07);border-radius:12px;padding:7px 4px;}
+.stat .num{font-size:17px;}.stat .lbl{font-size:11px;color:#b9d8d3;}
+.progress-track{height:7px;margin-bottom:14px;background:rgba(255,255,255,.14);}
+.progress-fill{background:var(--accent);}
+.index-card{background:#fffaf0;background-image:none;border-radius:26px;border-top:8px solid var(--accent);padding:26px 22px;box-shadow:0 18px 40px rgba(0,0,0,.35);min-height:min(58vh,560px);}
+.tag-corner{background:var(--accent) !important;border-radius:0 18px 0 12px;top:-8px;}
+.zh-big{color:#222;}
+.speak-btn{background:var(--accent);box-shadow:none;}
+.py-line{font-family:'Nunito',sans-serif;font-weight:800;font-size:26px;color:var(--accent);}
+.example-box{background:#f3efe4;border-left:0;border-radius:16px;}
+.flip-btn{background:var(--accent);color:#fff;box-shadow:none;}
+.peek-btn{border-color:#bbb;}
+.rate-btn{border-radius:14px;}
+.rate-btn.good{background:var(--accent);}
+.filter-chip.active{background:var(--accent);border-color:var(--accent);color:#fff;}
+.vocab-row,.round-card{background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.14);border-radius:16px;}
+.vocab-py{font-family:'Nunito',sans-serif;font-weight:800;font-size:16px;color:var(--accent2);}
+.round-card.all{background:color-mix(in srgb,var(--accent) 28%,transparent);border-color:var(--accent);}
+.round-heading{color:var(--accent2);}
+.game-question-card{border-radius:24px;}
+.mode-btn.active{background:var(--accent);border-color:var(--accent);}
+.footer-note{color:#8fb5af;}
+.tab-btn{white-space:nowrap;font-size:13.5px;gap:5px;padding:10px 4px;}
+.stat .lbl{white-space:nowrap;font-size:10px;letter-spacing:0;}
+.stat .num{font-size:16px;}
+.stat{gap:4px;padding:7px 2px;}
 </style>
 <link rel="icon" href="favicon.ico" sizes="any">
 <link rel="icon" type="image/svg+xml" href="icon.svg">
@@ -944,15 +992,12 @@
 <body>
 <div class="wrap">
 
-  <div class="header">
-    <div class="icon">🗂️</div>
-    <div class="title">生字卡 · Novice2 · Day 1-24</div>
-    <div class="subtitle">NOVICE2 (BLUE PAPER) · DAY 1–24 COMBINED</div>
-    <div class="made-by">
-      <span class="lbl">Made by</span>
-      <span class="name"><span class="zh">羅世成</span>Russel Acosta</span>
-    </div>
+  <div class="topbar">
+    <a class="back" href="index.html" title="Home">←</a>
+    <div class="ttl"><b>Novice 2</b><small>Blue paper · Day 1–24 · 羅世成 Russel Acosta</small></div>
+    <div class="pill">260</div>
   </div>
+  <div class="sel-row" id="selRow"></div>
 
   <div class="filter-row section-filter-row" id="sectionFilterRow"></div>
 
@@ -1634,7 +1679,7 @@ function setTab(tab){
   vocabTab.classList.toggle('active', tab==='vocab');
   gameTab.classList.toggle('active', tab==='game');
   sectionFilterRow.style.display = (tab==='game') ? 'none' : '';
-  if(tab==='game') showRoundSelect();
+  if(tab==='game'){ if(activeSection !== 'all') startRound(activeSection); else showRoundSelect(); }
 }
 tabBtnQuiz.addEventListener('click', () => setTab('quiz'));
 tabBtnVocab.addEventListener('click', () => setTab('vocab'));
@@ -2136,6 +2181,26 @@ traceModal.addEventListener('click', (e) => {
 buildFilters();
 initSession();
 renderVocabList();
+</script>
+<script>
+(function(){
+  const selRow=document.getElementById('selRow');if(!selRow)return;
+  const cfgs=[{id:'sectionFilterRow',label:'DAY',first:'All days'}];
+  cfgs.forEach(cfg=>{
+    const row=document.getElementById(cfg.id);if(!row)return;
+    const wrap=document.createElement('div');wrap.className='dd';
+    wrap.innerHTML='<small>'+cfg.label+'</small>';
+    const sel=document.createElement('select');wrap.appendChild(sel);selRow.appendChild(wrap);
+    function sync(){
+      sel.innerHTML='';const chips=[...row.children];
+      chips.forEach((c,i)=>{const o=new Option(i===0&&cfg.first?cfg.first:c.textContent.replace(/^📅\s*/,''),i);sel.add(o);if(c.classList.contains('active'))sel.value=i;});
+      wrap.style.display=chips.length?'':'none';
+    }
+    new MutationObserver(sync).observe(row,{childList:true,subtree:false});sync();
+    sel.addEventListener('change',()=>{const c=row.children[+sel.value];if(c)c.click();});
+  });
+  document.querySelectorAll('.tab-btn').forEach(b=>b.addEventListener('click',()=>{selRow.style.display=(b.dataset.tab==='game')?'none':'';}));
+})();
 </script>
 </body>
 </html>
