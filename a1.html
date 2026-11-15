@@ -995,6 +995,87 @@ body{background:radial-gradient(120% 55% at 50% 0,#14505a 0,#0b2a2f 62%) fixed,#
 <link rel="manifest" href="manifest.webmanifest">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="生字卡">
+<style>.st-badge{display:inline-block;font-size:10.5px;font-weight:800;letter-spacing:.04em;padding:2px 8px;border-radius:99px;margin-left:6px;vertical-align:middle;white-space:nowrap;}
+.st-badge.m{background:#ffe27a;color:#5b4300;}
+.st-badge.l{background:#ffd0d0;color:#8a1f1f;}
+</style>
+<script>const DECK_ID='a1';
+const LZC=(function(){
+  const KEY='lzc_progress_v1', TK='lzc_today_v1';
+  let S={},T={};
+  try{S=JSON.parse(localStorage.getItem(KEY)||'{}')||{}}catch(e){S={}}
+  try{T=JSON.parse(localStorage.getItem(TK)||'{}')||{}}catch(e){T={}}
+  const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}};
+  const saveT=()=>{try{localStorage.setItem(TK,JSON.stringify(T))}catch(e){}};
+  const pad=n=>String(n).padStart(2,'0');
+  const ds=d=>d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());
+  const today=()=>ds(new Date());
+  const addDays=n=>{const d=new Date();d.setDate(d.getDate()+n);return ds(d)};
+  const id=(deck,it)=>deck+'|'+it.zh+'|'+it.en+'|'+String(it.section||'').split(':').pop();
+  const rec=(deck,it)=>S[id(deck,it)]||null;
+  const ensure=(deck,it)=>{const k=id(deck,it);return S[k]||(S[k]={st:0,w:0})};
+  const INTERVAL={again:1,hard:2,good:7,easy:14};
+  function rate(deck,it,kind){
+    const r=ensure(deck,it);r.last=today();r.due=addDays(INTERVAL[kind]);
+    if(kind==='again'){r.sl=1;r.m=0;r.st=0;r.w=(r.w||0)+1}
+    else if(kind==='hard'){r.m=0;r.st=0}
+    else if(kind==='good'){r.st=(r.st||0)+1;r.sl=0;if(r.st>=2)r.m=1}
+    else{r.st=2;r.m=1;r.sl=0}
+    save();
+  }
+  function game(deck,it,ok,opt){
+    const r=ensure(deck,it);r.last=today();
+    if(ok){r.st=(r.st||0)+1;if(r.st>=2)r.m=1;if(opt&&opt.clearSL)r.sl=0;if(!r.due)r.due=addDays(7)}
+    else{r.sl=1;r.m=0;r.st=0;r.w=(r.w||0)+1;const t=addDays(1);if(!r.due||r.due>t)r.due=t}
+    save();
+  }
+  function status(deck,it){const r=rec(deck,it);if(!r)return 'new';if(r.sl)return 'learning';if(r.m)return 'mastered';return 'seen'}
+  function badge(deck,it){
+    const s=status(deck,it);
+    return s==='mastered'?'<span class="st-badge m">⭐ MASTERED</span>':s==='learning'?'<span class="st-badge l">📘 STILL LEARNING</span>':'';
+  }
+  function dueLabel(deck,it){
+    const r=rec(deck,it);if(!r||!r.due)return '';
+    const a=new Date(today()),b=new Date(r.due),n=Math.round((b-a)/86400000);
+    return n<0?'overdue '+(-n)+'d':n===0?'due today':n===1?'due tomorrow':'due in '+n+'d';
+  }
+  // ---- Today's Review (used by review.html) ----
+  function pick(all,n,exclude){
+    const t=today(),ex=new Set(exclude||[]),out=[];
+    const due=all.filter(x=>!ex.has(x.k)&&S[x.k]&&!S[x.k].sl&&S[x.k].due&&S[x.k].due<=t).sort((a,b)=>S[a.k].due<S[b.k].due?-1:1);
+    due.forEach(x=>{if(out.length<n)out.push(x.k)});
+    if(out.length<n){
+      const byDeck={};
+      all.filter(x=>!ex.has(x.k)&&!S[x.k]).forEach(x=>{(byDeck[x.deck]=byDeck[x.deck]||[]).push(x.k)});
+      const ks=Object.keys(byDeck);let i=0,guard=0;
+      while(out.length<n&&ks.some(k=>byDeck[k].length)&&guard++<5000){
+        const q=byDeck[ks[i%ks.length]];i++;if(q.length)out.push(q.shift());
+      }
+    }
+    if(out.length<n){
+      const rest=all.filter(x=>!ex.has(x.k)&&!out.includes(x.k)&&S[x.k]&&S[x.k].due).sort((a,b)=>S[a.k].due<S[b.k].due?-1:1);
+      rest.forEach(x=>{if(out.length<n)out.push(x.k)});
+    }
+    return out;
+  }
+  function ensureToday(all,size){
+    const t=today();
+    if(T.date===t&&T.ids)return T.ids;
+    if(T.date&&T.ids){
+      T.ids.forEach(k=>{
+        const r=S[k]||(S[k]={st:0,w:0});
+        if(r.last!==T.date){r.sl=1;r.m=0;if(!r.due||r.due>t)r.due=t}
+      });
+      save();
+    }
+    T={date:t,ids:pick(all,size||20,[])};saveT();return T.ids;
+  }
+  function moreToday(all,n){T.ids=T.ids.concat(pick(all,n,T.ids));saveT();return T.ids}
+  function isDone(k){const r=S[k];return !!(r&&r.last===today())}
+  return {id,rec,rate,game,status,badge,dueLabel,ensureToday,moreToday,isDone,today,addDays,
+          raw:()=>S,key:k=>k};
+})();
+</script>
 </head>
 <body>
 <div class="wrap">
@@ -1064,10 +1145,10 @@ body{background:radial-gradient(120% 55% at 50% 0,#14505a 0,#0b2a2f 62%) fixed,#
       </div>
 
       <div class="rate-row" id="rateRow">
-        <button class="rate-btn again" id="rateAgain">😵 Again<span class="sub">back in ~2</span></button>
-        <button class="rate-btn hard" id="rateHard">😬 Hard<span class="sub">back in ~6</span></button>
-        <button class="rate-btn good" id="rateGood">🙂 Good<span class="sub">back in ~12</span></button>
-        <button class="rate-btn easy" id="rateEasy">😎 Easy<span class="sub">graduate!</span></button>
+        <button class="rate-btn again" id="rateAgain">😵 Again<span class="sub">back in 1 day</span></button>
+        <button class="rate-btn hard" id="rateHard">😬 Hard<span class="sub">back in 2 days</span></button>
+        <button class="rate-btn good" id="rateGood">🙂 Good<span class="sub">back in 1 week</span></button>
+        <button class="rate-btn easy" id="rateEasy">😎 Easy<span class="sub">back in 2 weeks</span></button>
       </div>
 
       <div class="toast" id="toast"></div>
@@ -1645,7 +1726,7 @@ function nextCard(){
   const item = DATA[current];
   tagCorner.textContent = DAY_TAG;
   tagCorner.style.background = 'var(--tag-pink)';
-  sectionLabel.textContent = SECTION_LABEL[item.section];
+  sectionLabel.innerHTML = SECTION_LABEL[item.section] + LZC.badge(DECK_ID,item);
   zhBig.textContent = item.zh;
   pyLine.textContent = item.py;
   posBadge.textContent = item.pos;
@@ -1681,6 +1762,7 @@ function rate(kind){
   if(answered) return;
   answered = true;
   const idx = current;
+  LZC.rate(DECK_ID, DATA[idx], kind);
 
   if(kind === 'again'){
     streaks[idx] = 0;
@@ -1731,6 +1813,7 @@ function setTab(tab){
   quizTab.classList.toggle('active', tab==='quiz');
   vocabTab.classList.toggle('active', tab==='vocab');
   gameTab.classList.toggle('active', tab==='game');
+  if(tab==='vocab') renderVocabList();
   sectionFilterRow.style.display = (tab==='game') ? 'none' : '';
   if(tab==='game'){ if(activeSection !== 'all') startRound(activeSection); else showRoundSelect(); }
 }
@@ -1864,6 +1947,8 @@ function handleGameAnswer(btn, choice, correctItem){
   if(gState.locked) return;
   gState.locked = true;
   const isCorrect = choice === correctItem;
+  gState._m = isCorrect;
+  if(!(gameMode === 'both' && correctItem.tones)) LZC.game(DECK_ID, correctItem, isCorrect);
   const hideTone = (gameMode === 'both' && !!correctItem.tones);   // don't reveal pinyin/audio before the tone question
 
   [...gameChoices.children].forEach(c => c.classList.add('disabled'));
@@ -2029,6 +2114,7 @@ function showToneStep(item){
     });
     if(firstCheck){
       firstCheck = false;
+      LZC.game(DECK_ID, item, allRight && !(gameMode === 'both' && gState._m === false));
       gState.toneWords += 1;
       if(allRight){
         gState.toneRight += 1;
@@ -2103,7 +2189,7 @@ function renderVocabList(){
           <div class="vocab-zh">${item.zh}</div>
           <div class="vocab-info">
             <div class="vocab-meta">
-              <span class="vocab-py">${item.py}</span>
+              <span class="vocab-py">${item.py}</span>${LZC.badge(DECK_ID,item)}
               <span class="vocab-pos">${item.pos}</span>
             </div>
             <div class="vocab-en">${item.en}</div>
